@@ -1,232 +1,71 @@
-# SubFix
-`SubFix` is a web tool designed for easily editing and modifying audio subtitles. Users can see changes in real-time and conveniently **merge, split, delete, and edit subtitles** of audios.
+# 原项目地址
+[SubFix](https://github.com/cronrpc/SubFix)
 
-`SubFix` also supports automated voice annotation, utilizing `modelscope` and `whisper` for multilingual text annotation. Currently, `modelscope` provides automated annotations in languages including Chinese, English, Japanese, German, and Russian. `whisper` supports almost all languages."
+# Change Log
+V2:汉化，添加裁剪音频功能，删除音频时同时删除音频文件
 
-[中文版本](README_zh.md)
+V3:为裁剪音频添加先自动提交文本，再执行裁剪的功能
 
-An standalone `.py` file version is available for access at [subfix_webui.py](https://github.com/cronrpc/SubFix/blob/main/subfix_webui.py). This version allows language selection through command-line parameters, supporting both English and Chinese. Additionally, users can choose whether to synchronize the deletion of audio files on the hard drive during editing.
-
-Usage instructions for the standalone Python file version can be found at: [subfix_webui.py Help](#subfix_webuipy)
-
-## Installation
-
-Follow these steps for a quick and easy installation. It's recommended to use a `Linux` environment. If using `Windows`, you will need to manually configure the `ffmpeg` environment variable, and installing `modelscope` might be more complex.
-
-### Installing Dependencies
-
-Ensure the installed version of `Python` is above `3.9`, then execute the following command. If you do not need to use automatic labeling of audio, there is no need to install the `Modelscope` module.
-
-Using Conda:
-```bash
-conda create -n modelscope python=3.9
-conda activate modelscope
-```
-
-Installing Dependencies
-
-#### In a Linux environment
-
-```bash
-sudo apt install build-essential
-sudo apt install ffmpeg
-sudo apt install libsox-dev
-
-git clone https://github.com/cronrpc/SubFix.git
-cd SubFix
-pip install "modelscope[audio_asr]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
-pip install -e .
-```
-
-#### Updating modelscope and FunASR to the Latest Versions
-
-Due to recent changes in the modelscope API, the code installed via pip may not be the latest version, potentially causing issues with automatic annotation. 
-
-To ensure compatibility, it is recommended to install the latest version directly from the GitHub repository:
-
-```bash
-# Install FunASR
-git clone https://github.com/alibaba/FunASR.git && cd FunASR
-pip3 install -e ./
-
-# Install modelscope
-git clone https://github.com/modelscope/modelscope.git
-cd modelscope
-pip install -e .
-pip install -e .[audio_asr]
-```
-
-#### In a Windows environment
-
-If you have a GPU, you need to install the `cuda` version of `pytorch` beforehand and configure environment variables such as `ffmpeg`. Then execute the following commands:
-
-```bash
-git clone https://github.com/cronrpc/SubFix.git
-cd SubFix
-pip install "modelscope[audio_asr]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
-pip install -e .
-```
-
-For information on installing pytorch, please visit(https://pytorch.org/get-started/locally/)
-
-## Usage Guide
-
-After installing with `pip install -e .`, you can start the tool from any directory in the `shell` using the following command. All parameters have default values, so you don't need to input any `--option` if the default is used.
-```bash
-subfix -h
-
-# webui
-subfix webui -h
-subfix webui --load_list demo.list --webui_language zh --force_delete True
-# create dataset
-subfix create modelscope -h
-# English
-subfix create modelscope --source_dir origin --language EN
-# Chinese
-subfix create modelscope --source_dir origin --language ZH
-# Japanese
-subfix create modelscope --source_dir origin --language JA
-# OpenAI Whisper Annotation (Supports Almost All Languages)
-subfix create whisper --source_dir origin --language ZH
-subfix create whisper --source_dir origin --language JA
-# diarization (speaker segmentation)
-subfix diarization -h
-subfix diarization --source_dir origin --target_dir diarization --min_seconds 3.0
-```
-
-Before using automated annotation, it's recommended to clear the `cache/subfix/` folder.
-```bash
-rm -rf cache/subfix
-```
-
-## Starting SubFix to View Dataset
-
-`SubFix` supports two formats: `.json` and `.list`.
-
-In the `.list` format, each line is similar to `"{wav_path}|{speaker_name}|{language}|{text}"`.
-
-For example, if you already have a `demo.list` file and its corresponding audio files are in the correct path, you can use the following commands to start the `SubFix` UI interface:
-
-```bash
-subfix webui --load_list demo.list
-# or
-subfix webui --load_json demo.json
-```
-
-Viewing Help:
-```bash
-subfix --help
-subfix webui --help
-```
-
-### Quick Viewing and Listening to Audio
-
-You can click the `Previous Index` and `Next Index` buttons to switch lists, or drag the `slider` and click `Change Index` for quick positioning in the list.
-
-![change index gif](images/index.gif)
-
-### Modifying Text
-
-You can directly modify the text and click the `Submit Text` button to save the changes.
-
-![change text gif](images/text.gif)
-
-### Merging
-
-Select the audios you want to merge, set the `merge interval`, and then click the `merge` button to merge the audio.
-
-![merge audio gif](images/merge.gif)
-
-### Splitting Audio
-
-Select the audio to be split, set the `split point`, and then click the `split` button to proceed. Note that only one audio can be split at a time, and the text needs to be adjusted again after splitting.
-
-![split audio gif](images/split.gif)
-
-### Deleting
-
-Select the audio to be deleted and click the `button` to delete. The delete operation will be temporarily stored in memory. To save it to a file, click the save button or execute another command.
-
-![delete audio gif](images/delete.gif)
-
-### Automated Audio Annotation and Dataset Creation
-
-By default, place the audio files in the `origin` folder. For an audio file `abc.wav` by a speaker `sam`, its file path could be structured like `./origin/sam/abc.wav`. Then execute the following command:
-
-```bash
-# rm -rf cache/subfix
-subfix create --source_dir origin --output demo.list
-```
-
-This command will create a `dataset` directory and store the paths and subtitles of all transcribed audio files in the `demo.list` file.
-
-### Add Punctuation to List Files
-
-If you want to use punctuation, use the following command to automatically add punctuation to the text in the list file:
+# 安装
 
 ```
-subfix punctuation --load_list demo.list
+conda create -n audio_label python=3.10
+conda activate audio_label
+cd audio_label
+pip install -r requirements.txt
 ```
 
-### Speaker Recognition and Clustering
 
-In some cases, large audio segments might include background music, leading to the recognition of vocals or noise from the background song, causing multiple speakers to be identified in the same file. Or, when speaking is too dense, it might result in excessively long recognized audio.
 
-This feature extracts the `n` most frequent speakers from each file, with an interval of `interval` seconds between each sentence spoken by the same person. This is saved in the `diarization` folder, making it easier to extract audio later.
+# 使用
 
-```bash
-subfix diarization --source_dir origin --target_dir diarization --min_seconds 3.0 --interval 10 --top_of_number 1
-subfix create modelscope --source_dir diarization --language ZH
+## 启动
+
+```
+python subfix_webui_V3.py [可选参数]
 ```
 
-## Format Conversion
+默认使用`./data/test.list`文件启动服务
 
-The two formats, `.list` and `.json`, can be converted into each other. Use the following commands to convert files:
+### 可选参数
 
-```bash
-subfix format_convert --source demo.list --target demo.json
-subfix format_convert --source demo.json --target demo.list
-```
+`--load_list [.list文件路径]` 指定.list文件路径
 
-## subfix_webui.py
+`--is_share True` 是否生成Gradio公网分享地址
+
+`--webui_port 9875` 指定服务端口，默认8080
+
+`--g_batch [10]`  指定一批次音频数量，默认为10
 
 
-Usage of the standalone Python file version:
 
-View Help
+## 功能说明
 
-```bash
-python subfix_webui.py -h
-```
+提交文本:将窗口内的文本存入内存并写入文件
 
-Launch in Chinese
+跳转索引:跳转至指定音频位置的页面
 
-```bash
-python subfix_webui.py --webui_language zh --load_list demo.list
-```
+分割音频:将选定的音频,在指定的秒数位置截断为两个音频文件
 
-Specify a `.list` File
+裁剪音频:从选定的音频中,裁剪出A%到B%位置的音频,并删除其余内容(不可恢复)
 
-```bash
-python subfix_webui.py --load_list demo.list
-```
+删除音频:删除所选条目及音频文件(不可恢复)
 
-Synchronize deletion of disk files, the default value is True.
+合并音频:合并所选音频文件
 
-```bash
-python subfix_webui.py --force_delete True
-# or
-python subfix_webui.py --force_delete False
-```
+下批索引:跳转至下一页
 
-Launch with a specified port
+上批索引:跳转至上一页
 
-```bash
-python subfix_webui.py --server_port 1234
-```
+提交并下批索引:提交文本+下批索引
 
-## References
+反选:反选所选项
 
-- [anyvoiceai/MassTTS](https://github.com/anyvoiceai/MassTTS)
-- [fishaudio/Bert-VITS2](https://github.com/fishaudio/Bert-VITS2)
-- [openai/whisper](https://github.com/openai/whisper)
+保存文件:将内存中的数据写入文件(基本无用)
+
+
+
+
+
+
+
